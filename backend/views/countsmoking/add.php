@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 <div class="countsmoking-add">
 
     <?php $form = ActiveForm::begin(); ?>
-
+        <?= Html::csrfMetaTags() ?>
         <?= $form->field($model, 'data') ?>
         <?= $form->field($model, 'count') ?>
     
