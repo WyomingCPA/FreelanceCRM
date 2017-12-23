@@ -25,12 +25,17 @@ class CountsmokingController extends \yii\web\Controller
         ]);
 
         $last_element = $last_element = Countsmoking::find()->where(['between', 'data', $today_day . " 00:00:01", $today_day . " 23:59:59" ])->orderBy(['data' => SORT_DESC])->one();
-
-        $latest_date_time = strtotime($last_element->data);
-        $latest_date_time = date('Y-m-d H:i:s', $latest_date_time);
-        $datetime1 = new DateTime($latest_date_time);
-
-        $interval = $datetime1->diff(new DateTime())->format("%d days, %h hours and %i minuts"); 
+        if ($last_element != null){
+            $latest_date_time = strtotime($last_element->data);
+            $latest_date_time = date('Y-m-d H:i:s', $latest_date_time);
+            $datetime1 = new DateTime($latest_date_time);
+    
+            $interval = $datetime1->diff(new DateTime())->format("%d days, %h hours and %i minuts"); 
+        }
+        else
+        {
+            $interval = 'Нет данных';
+        }
 
         return $this->render('index', ['dataProvider' => $provider, 'interval' => $interval ]);
     }
@@ -46,20 +51,31 @@ class CountsmokingController extends \yii\web\Controller
             $today_day = date('Y-m-d');
 
             $last_element = Countsmoking::find()->where(['between', 'data', $today_day . " 00:00:01", $today_day . " 23:59:59" ])->orderBy(['data' => SORT_DESC])->one();
-            $latest_date_time = strtotime($last_element->data);
-            $latest_date_time = date('Y-m-d H:i:s', $latest_date_time);
-            $datetime1 = new DateTime($latest_date_time);
-
-            $interval = (int)$datetime1->diff(new DateTime())->format("%h");           
-            $model->data = date('Y-m-d H:i:s'); 
-            if ($interval < 2)
+            if ($last_element != null)
             {
-                $model->count = $last_element->count + 1;
+                $latest_date_time = strtotime($last_element->data);
+                $latest_date_time = date('Y-m-d H:i:s', $latest_date_time);
+                $datetime1 = new DateTime($latest_date_time);
+    
+                $interval = (int)$datetime1->diff(new DateTime())->format("%h");  
+                
+                $model->data = date('Y-m-d H:i:s'); 
+                if ($interval < 2)
+                {
+                    $model->count = $last_element->count + 1;
+                }
+                else
+                {
+                    $model->count = $last_element->count;
+                }
+                
             }
             else
             {
-                $model->count = $last_element->count;
+                $model->data = date('Y-m-d H:i:s'); 
+                $model->count = 1;
             }
+
 
             $model->save(false);
 
